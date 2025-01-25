@@ -61,34 +61,34 @@ if not st.session_state.bets.empty:
     )
 
     # Generate a profit-over-time graph
-    st.header("Profit Over Time")
+    st.header("Profit Tracker")
 
     # Convert the 'date' column to datetime
     st.session_state.bets["date"] = pd.to_datetime(st.session_state.bets["date"])
 
-    # Let the user choose the time grouping: monthly or yearly
-    time_group = st.radio("Group by", options=["Monthly", "Yearly"], horizontal=True)
+    # Let the user scroll through months and view daily profit
+    unique_months = st.session_state.bets["date"].dt.to_period("M").drop_duplicates().sort_values()
+    selected_month = st.selectbox("Select Month", unique_months.astype(str))
 
-    if time_group == "Monthly":
-        st.session_state.bets["period"] = st.session_state.bets["date"].dt.to_period("M").dt.to_timestamp()
-        profit_summary = st.session_state.bets.groupby("period")["profit"].sum().reset_index()
-        profit_summary = profit_summary.rename(columns={"period": "Month", "profit": "Profit"})
-        profit_summary["Month"] = profit_summary["Month"].dt.strftime("%B %Y")
+    # Filter data for the selected month
+    selected_month_start = pd.Period(selected_month).start_time
+    selected_month_end = pd.Period(selected_month).end_time
+    filtered_data = st.session_state.bets[
+        (st.session_state.bets["date"] >= selected_month_start) &
+        (st.session_state.bets["date"] <= selected_month_end)
+    ]
+
+    if not filtered_data.empty:
+        daily_summary = filtered_data.groupby(filtered_data["date"].dt.date)["profit"].sum().reset_index()
+        daily_summary = daily_summary.rename(columns={"date": "Day", "profit": "Profit"})
+
         st.line_chart(
-            profit_summary.set_index("Month"),
+            daily_summary.set_index("Day"),
             use_container_width=True,
             height=400
         )
     else:
-        st.session_state.bets["period"] = st.session_state.bets["date"].dt.to_period("Y").dt.to_timestamp()
-        profit_summary = st.session_state.bets.groupby("period")["profit"].sum().reset_index()
-        profit_summary = profit_summary.rename(columns={"period": "Year", "profit": "Profit"})
-        profit_summary["Year"] = profit_summary["Year"].dt.strftime("%Y")
-        st.line_chart(
-            profit_summary.set_index("Year"),
-            use_container_width=True,
-            height=400
-        )
+        st.info("No betting data available for the selected month.")
 else:
     st.info("No betting data available. Use the sidebar to add new bets.")
 
