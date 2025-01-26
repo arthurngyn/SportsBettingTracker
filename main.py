@@ -51,6 +51,11 @@ st.header("Your Betting Data")
 if not st.session_state.bets.empty:
     st.dataframe(st.session_state.bets)
 
+     # Display total profit below the table
+    total_profit = st.session_state.bets["profit"].sum()
+    profit_color = "#008000" if total_profit >= 0 else "#FF0000"
+    st.markdown(f"### Total Profit: <span style='color:{profit_color}; font-weight: bold;'>${total_profit:,.2f}</span>", unsafe_allow_html=True)
+
     # Allow downloading the data as a CSV file
     csv = st.session_state.bets.to_csv(index=False)
     st.download_button(
@@ -92,8 +97,3 @@ if not st.session_state.bets.empty:
 else:
     st.info("No betting data available. Use the sidebar to add new bets.")
 
-# Footer
-st.markdown("---")
-st.markdown(
-    "**Sports Betting Tracker** - Created with Streamlit. Track your bets easily and visualize your profit over time!"
-)
