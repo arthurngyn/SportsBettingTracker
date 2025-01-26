@@ -45,11 +45,36 @@ with st.sidebar.form("bet_form"):
         st.session_state.bets.to_csv(csv_file, index=False)
         st.success("Bet added and saved successfully!")
 
+# Import data from a CSV file
+st.sidebar.header("Import Betting Data")
+imported_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
+if imported_file is not None:
+    try:
+        imported_data = pd.read_csv(imported_file)
+        if set(["date", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"]).issubset(imported_data.columns):
+            imported_data["date"] = pd.to_datetime(imported_data["date"], errors='coerce')
+            st.session_state.bets = imported_data  # Overwrite existing data
+            st.session_state.bets.to_csv(csv_file, index=False)
+            st.success("Data imported successfully and overwritten!")
+        else:
+            st.error("The uploaded CSV does not have the required columns.")
+    except Exception as e:
+        st.error(f"An error occurred while importing data: {e}")
+
 # Display current betting data
 st.header("Your Betting Data")
 
 if not st.session_state.bets.empty:
     st.dataframe(st.session_state.bets)
+
+    # Option to remove rows
+    st.subheader("Remove Data")
+    indices_to_remove = st.multiselect("Select rows to remove:", st.session_state.bets.index, format_func=lambda x: f"Date: {st.session_state.bets.iloc[x]['date']}, Amount Invested: {st.session_state.bets.iloc[x]['amount_invested']}, Picks: {st.session_state.bets.iloc[x]['num_picks']}, Result: {st.session_state.bets.iloc[x]['win_or_lose']}, Amount Paid: {st.session_state.bets.iloc[x]['amount_paid']}, Profit: {st.session_state.bets.iloc[x]['profit']}")
+    if st.button("Remove Selected Rows"):
+        st.session_state.bets.drop(indices_to_remove, inplace=True)
+        st.session_state.bets.reset_index(drop=True, inplace=True)
+        st.session_state.bets.to_csv(csv_file, index=False)
+        st.success("Selected rows removed and data updated successfully!")
 
      # Display total profit below the table
     total_profit = st.session_state.bets["profit"].sum()
