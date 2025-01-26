@@ -70,11 +70,13 @@ if not st.session_state.bets.empty:
     # Option to remove rows
     st.subheader("Remove Data")
     indices_to_remove = st.multiselect("Select rows to remove:", st.session_state.bets.index, format_func=lambda x: f"Date: {st.session_state.bets.iloc[x]['date']}, Amount Invested: {st.session_state.bets.iloc[x]['amount_invested']}, Picks: {st.session_state.bets.iloc[x]['num_picks']}, Result: {st.session_state.bets.iloc[x]['win_or_lose']}, Amount Paid: {st.session_state.bets.iloc[x]['amount_paid']}, Profit: {st.session_state.bets.iloc[x]['profit']}")
-    if st.button("Remove Selected Rows"):
-        st.session_state.bets.drop(indices_to_remove, inplace=True)
-        st.session_state.bets.reset_index(drop=True, inplace=True)
-        st.session_state.bets.to_csv(csv_file, index=False)
-        st.success("Selected rows removed and data updated successfully!")
+    if st.button("Remove Selected Rows", key="remove_rows_button"):
+        if indices_to_remove:
+            st.session_state.bets.drop(indices_to_remove, inplace=True)
+            st.session_state.bets.reset_index(drop=True, inplace=True)
+            st.session_state.bets.to_csv(csv_file, index=False)
+            st.success("Selected rows removed and data updated successfully!")
+            st.rerun()
 
      # Display total profit below the table
     total_profit = st.session_state.bets["profit"].sum()
@@ -121,4 +123,3 @@ if not st.session_state.bets.empty:
         st.info("No betting data available for the selected month.")
 else:
     st.info("No betting data available. Use the sidebar to add new bets.")
-
