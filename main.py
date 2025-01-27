@@ -76,15 +76,27 @@ if not st.session_state.bets.empty:
     # Option to remove rows
     st.subheader("Remove Data")
     indices_to_remove = st.multiselect("Select rows to remove:", st.session_state.bets.index, format_func=lambda x: f"Date: {st.session_state.bets.iloc[x]['date']}, Sport: {st.session_state.bets.iloc[x]['sport']}, Amount Invested: {st.session_state.bets.iloc[x]['amount_invested']}, Picks: {st.session_state.bets.iloc[x]['num_picks']}, Result: {st.session_state.bets.iloc[x]['win_or_lose']}, Amount Paid: {st.session_state.bets.iloc[x]['amount_paid']}, Profit: {st.session_state.bets.iloc[x]['profit']}")
-    if st.button("Remove Selected Rows", key="remove_rows_button"):
-        if indices_to_remove:
-            st.session_state.bets.drop(indices_to_remove, inplace=True)
-            st.session_state.bets.reset_index(drop=True, inplace=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Remove Selected Rows", key="remove_rows_button"):
+            if indices_to_remove:
+                st.session_state.bets.drop(indices_to_remove, inplace=True)
+                st.session_state.bets.reset_index(drop=True, inplace=True)
+                st.session_state.bets.to_csv(csv_file, index=False)
+                st.success("Selected rows removed and data updated successfully!")
+                st.rerun()
+    
+    with col2:
+        if st.button("Reset and Delete All Data"):
+            st.session_state.bets = pd.DataFrame(columns=[
+                "date", "sport", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"
+            ])
             st.session_state.bets.to_csv(csv_file, index=False)
-            st.success("Selected rows removed and data updated successfully!")
+            st.success("All data has been reset and deleted successfully!")
             st.rerun()
 
-     # Display total profit below the table
+    # Display total profit below the table
     total_profit = st.session_state.bets["profit"].sum()
     profit_color = "#008000" if total_profit >= 0 else "#FF0000"
     st.markdown(f"### Total Profit: <span style='color:{profit_color}; font-weight: bold;'>${total_profit:,.2f}</span>", unsafe_allow_html=True)
@@ -102,7 +114,7 @@ if not st.session_state.bets.empty:
     st.header("Profit Tracker")
 
     # Convert the 'date' column to datetime
-    st.session_state.bets["date"] = pd.to_datetime(st.session_state.bets["date"])
+    st.session_state.bets["date"] = pd.to_datetime(st.session_state.bets["date"], errors='coerce')
 
     # Let the user scroll through months and view daily profit
     unique_months = st.session_state.bets["date"].dt.to_period("M").drop_duplicates().sort_values()
