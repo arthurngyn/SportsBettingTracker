@@ -9,7 +9,7 @@ if os.path.exists(csv_file):
     st.session_state.bets = pd.read_csv(csv_file)
 else:
     st.session_state.bets = pd.DataFrame(columns=[
-        "date", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"
+        "date", "sport" ,"amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"
     ])
 
 # Sidebar for inputting data
@@ -17,6 +17,7 @@ st.sidebar.header("Add a New Bet")
 
 with st.sidebar.form("bet_form"):
     date = st.date_input("Date", value=datetime.today())
+    sport = st.text_input("Sport", placeholder="Enter the sport you bet on")
     amount_invested = st.number_input("Amount Invested ($)", min_value=0.0, step=1.0, format="%.2f")
     num_picks = st.number_input("Number of Picks", min_value=1, step=1)
     win_or_lose = st.radio("Win or Lose", options=["Win", "Lose"])
@@ -31,6 +32,7 @@ with st.sidebar.form("bet_form"):
         # Append the new bet to the session state dataframe
         new_bet = {
             "date": date,
+            "sport": sport,
             "amount_invested": amount_invested,
             "num_picks": num_picks,
             "win_or_lose": win_or_lose,
@@ -51,7 +53,7 @@ imported_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
 if imported_file is not None:
     try:
         imported_data = pd.read_csv(imported_file)
-        if set(["date", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"]).issubset(imported_data.columns):
+        if set(["date", "sport", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"]).issubset(imported_data.columns):
             imported_data["date"] = pd.to_datetime(imported_data["date"], errors='coerce')
             st.session_state.bets = imported_data  # Overwrite existing data
             st.session_state.bets.to_csv(csv_file, index=False)
@@ -65,11 +67,15 @@ if imported_file is not None:
 st.header("Your Betting Data")
 
 if not st.session_state.bets.empty:
+    # Reorder columns to have 'sport' next to 'date'
+    reordered_columns = ["date", "sport", "amount_invested", "num_picks", "win_or_lose", "amount_paid", "profit"]
+    st.session_state.bets = st.session_state.bets[reordered_columns]
+    
     st.dataframe(st.session_state.bets)
 
     # Option to remove rows
     st.subheader("Remove Data")
-    indices_to_remove = st.multiselect("Select rows to remove:", st.session_state.bets.index, format_func=lambda x: f"Date: {st.session_state.bets.iloc[x]['date']}, Amount Invested: {st.session_state.bets.iloc[x]['amount_invested']}, Picks: {st.session_state.bets.iloc[x]['num_picks']}, Result: {st.session_state.bets.iloc[x]['win_or_lose']}, Amount Paid: {st.session_state.bets.iloc[x]['amount_paid']}, Profit: {st.session_state.bets.iloc[x]['profit']}")
+    indices_to_remove = st.multiselect("Select rows to remove:", st.session_state.bets.index, format_func=lambda x: f"Date: {st.session_state.bets.iloc[x]['date']}, Sport: {st.session_state.bets.iloc[x]['sport']}, Amount Invested: {st.session_state.bets.iloc[x]['amount_invested']}, Picks: {st.session_state.bets.iloc[x]['num_picks']}, Result: {st.session_state.bets.iloc[x]['win_or_lose']}, Amount Paid: {st.session_state.bets.iloc[x]['amount_paid']}, Profit: {st.session_state.bets.iloc[x]['profit']}")
     if st.button("Remove Selected Rows", key="remove_rows_button"):
         if indices_to_remove:
             st.session_state.bets.drop(indices_to_remove, inplace=True)

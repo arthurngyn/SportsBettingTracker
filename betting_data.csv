@@ -1,3 +1,4 @@
-date,amount_invested,num_picks,win_or_lose,amount_paid,profit
-2025-01-24,20.0,2,Win,33.0,13.0
-2025-01-25,20.0,3,Win,58.4,38.4
+date,amount_invested,num_picks,win_or_lose,amount_paid,profit,sport
+2025-01-26,10.0,3,Lose,0.0,-10.0,NFL
+2025-01-25,20.0,3,Win,58.4,38.4,NBA
+2025-01-24,20.0,2,Win,33.0,13.0,NBA
