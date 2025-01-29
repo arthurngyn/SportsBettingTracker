@@ -1,5 +1,6 @@
+pymongo[srv]
+dnspython
 streamlit
 pandas
-pymongo
 bcrypt
-streamlit-cookies-manager
+streamlit_cookies_manager
