@@ -2,6 +2,8 @@
 
 This project is a simple and interactive sports betting tracker built with Python and Streamlit. It helps users input and monitor their betting activities, track their profits, and visualize performance over time.
 
+https://bettingtracker.streamlit.app/
+
 ## Features
 
 1. **User Authentication**
