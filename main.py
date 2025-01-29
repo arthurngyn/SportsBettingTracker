@@ -14,8 +14,8 @@ if not cookies.ready():
 
 # MongoDB Connection Setup
 
-mongodb_string = st.secrets["MONGODB_STRING"]
-client = MongoClient(mongodb_string)
+#mongodb_string = st.secrets["MONGODB_STRING"]
+client = MongoClient('mongodb+srv://arthur:arthur3591@sportsbettingtracker.kx3wi.mongodb.net/')
 
 db = client["sportsbetting"]
 users_collection = db["users"]
