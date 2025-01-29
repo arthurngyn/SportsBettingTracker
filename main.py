@@ -13,25 +13,8 @@ if not cookies.ready():
     st.stop()
 
 # MongoDB Connection Setup
-mongodb_string = st.secrets["MONGODB"]["MONGODB_STRING"]
-if not mongodb_string:
-    st.error("MONGODB_STRING environment variable is not set.")
-    st.stop()
 
-# Attempt to connect to MongoDB
-try:
-    client = MongoClient(mongodb_string, tls=True, tlsAllowInvalidCertificates=True, serverSelectionTimeoutMS=5000)
-    client.server_info()  # Trigger a server selection to verify connection
-except errors.ServerSelectionTimeoutError as err:
-    st.error(f"Failed to connect to MongoDB: {err}")
-    st.stop()
-except errors.ConnectionFailure as err:
-    st.error(f"Connection failure: {err}")
-    st.stop()
-except Exception as err:
-    st.error(f"An error occurred: {err}")
-    st.stop()
-
+client = MongoClient(os.getenv("MONGODB_STRING"))
 db = client["sportsbetting"]
 users_collection = db["users"]
 bets_collection = db["bets"]
