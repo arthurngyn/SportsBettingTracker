@@ -25,6 +25,12 @@ try:
 except errors.ServerSelectionTimeoutError as err:
     st.error(f"Failed to connect to MongoDB: {err}")
     st.stop()
+except errors.ConnectionFailure as err:
+    st.error(f"Connection failure: {err}")
+    st.stop()
+except Exception as err:
+    st.error(f"An error occurred: {err}")
+    st.stop()
 
 db = client["sportsbetting"]
 users_collection = db["users"]
