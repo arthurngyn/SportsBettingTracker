@@ -13,12 +13,7 @@ if not cookies.ready():
     st.stop()
 
 # MongoDB Connection Setup
-
-#mongodb_string = os.getenv("MONGODB_STRING")
-#st.write(f"MongoDB Connection String: {mongodb_string}")  # Debugging
-
 mongodb_string = st.secrets["MONGODB_STRING"]
-st.write(f"MongoDB Connection String: {mongodb_string}")  # Debugging
 client = MongoClient(mongodb_string)
 
 db = client["sportsbetting"]
